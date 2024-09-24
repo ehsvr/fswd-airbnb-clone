@@ -42,28 +42,42 @@ class BookingWidget extends React.Component {
 
   submitBooking = (e) => {
     if (e) { e.preventDefault(); }
+    
     const { startDate, endDate } = this.state;
-    console.log(startDate.format('MMM DD YYYY'), endDate.format('MMM DD YYYY'));
-
+  
+    // Check if dates are selected before proceeding
+    if (!startDate || !endDate) {
+      alert("Please select a start and end date before submitting.");
+      return;
+    }
+  
+    // Log the startDate and endDate to make sure they are correct
+    console.log('Submitting Booking with Dates:', {
+      startDate: startDate.format('YYYY-MM-DD'),
+      endDate: endDate.format('YYYY-MM-DD')
+    });
+  
     fetch(`/api/bookings`, safeCredentials({
       method: 'POST',
       credentials: 'include',
-        body: JSON.stringify({
-          booking: {
-            property_id: this.props.property_id,
-            start_date: startDate.format('MMM DD YYYY'),
-            end_date: endDate.format('MMM DD YYYY'),
-          }
-        })
+      body: JSON.stringify({
+        booking: {
+          property_id: this.props.property_id,
+          start_date: startDate.format('YYYY-MM-DD'),
+          end_date: endDate.format('YYYY-MM-DD'),
+        }
+      })
     }))
-      .then(handleErrors)
-      .then(response => {
-        return this.initiateStripeCheckout(response.booking.id)
-      })
-      .catch(error => {
-        console.log(error);
-      })
+    .then(handleErrors)
+    .then(response => {
+      console.log('Booking Created:', response);
+      return this.initiateStripeCheckout(response.booking.id);
+    })
+    .catch(error => {
+      console.error('Error during booking creation:', error); // Log any POST errors
+    });
   }
+  
 
   initiateStripeCheckout = (booking_id) => {
     return fetch(`/api/charges?booking_id=${booking_id}&cancel_url=${window.location.pathname}`, safeCredentials({
@@ -74,14 +88,17 @@ class BookingWidget extends React.Component {
         const stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY);
 
         stripe.redirectToCheckout({
-          // Make the id field from the Checkout Session creation API response
-          // available to this file, so you can provide it as parameter here
-          // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
           sessionId: response.charge.checkout_session_id,
         }).then((result) => {
-          // If `redirectToCheckout` fails due to a browser or network
-          // error, display the localized error message to your customer
-          // using `result.error.message`.
+            if (result.error) {
+                console.error('Stripe Checkout Error:', result.error.message);
+
+                this.setState({
+                    error: true,
+                    errorMessage: result.error.message,
+                });
+                alert(`Error: ${result.error.message}`);
+            }
         });
       })
       .catch(error => {
@@ -136,7 +153,9 @@ class BookingWidget extends React.Component {
               <p>${(price_per_night * days).toLocaleString()}</p>
             </div>
           )}
-          <button type="submit" className="btn btn-large btn-danger btn-block">Book</button>
+            <button type="submit" className="btn btn-large btn-danger btn-block">
+                Book
+            </button>
         </form>
       </div>
     )

@@ -21,7 +21,7 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'kaminari'
 # Use Stripe for receiving payments
 gem 'stripe'
-
+gem 'dotenv'
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'

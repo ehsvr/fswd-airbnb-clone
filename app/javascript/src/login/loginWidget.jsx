@@ -57,4 +57,4 @@ class LoginWidget extends React.Component {
     )
   }
 }
-export default LoginWidget;
+export default LoginWidget

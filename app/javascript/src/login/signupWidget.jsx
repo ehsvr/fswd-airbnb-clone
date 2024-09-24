@@ -85,4 +85,4 @@ class SignupWidget extends React.Component {
     )
   }
 }
-export default SignupWidget;
+export default SignupWidget
