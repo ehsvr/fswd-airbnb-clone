@@ -21,7 +21,10 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'kaminari'
 # Use Stripe for receiving payments
 gem 'stripe'
-gem 'dotenv'
+# Allow for .env files
+gem 'dotenv-rails'
+# AWS
+gem 'aws-sdk-s3'
 
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'

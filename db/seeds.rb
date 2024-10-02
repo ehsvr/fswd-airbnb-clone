@@ -6,6 +6,12 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
+require 'open-uri'
+
+Property.destroy_all
+User.destroy_all
+
+# Create Users
 users = User.create([
   { username: 'Tommy', email: 'tommy@test.com', password: 'password' },
   { username: 'Bobby', email: 'bobby@test.com', password: 'password' },
@@ -15,7 +21,8 @@ users = User.create([
   { username: 'Cammy', email: 'cammy@test.com', password: 'password' },
 ])
 
-properties = Property.create([
+# Create Properties and attach images
+property_data = [
   {
     title: 'Studio Apartment Minutes from Metro',
     description: '10 minute bus ride (1 stop) to NYC Times Square. Bus stop is a 2 mins walk from house and frequency is every few minutes for 24 hours. Super safe and Quiet neighborhood.',
@@ -251,4 +258,27 @@ properties = Property.create([
     image_url: 'https://cdn.altcademy.com/assets/images/medium/airbnb_clone/18.jpg',
     user: users.last
   }
-])
+]
+
+# Create Properties and attach images
+property_data.each do |property_attrs|
+  property = Property.create!(
+    title: property_attrs[:title],
+    description: property_attrs[:description],
+    city: property_attrs[:city],
+    country: property_attrs[:country],
+    property_type: property_attrs[:property_type],
+    price_per_night: property_attrs[:price_per_night],
+    max_guests: property_attrs[:max_guests],
+    bedrooms: property_attrs[:bedrooms],
+    beds: property_attrs[:beds],
+    baths: property_attrs[:baths],
+    user: property_attrs[:user]
+  )
+
+  # Attach image using Active Storage
+  property.images.attach(
+    io: URI.open(property_attrs[:image_url]),
+    filename: "property_image_#{property.id}.jpg"
+  )
+end

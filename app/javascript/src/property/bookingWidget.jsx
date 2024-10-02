@@ -3,9 +3,7 @@ import React from 'react';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import { safeCredentials, handleErrors } from '@utils/fetchHelper';
-
 import 'react-dates/lib/css/_datepicker.css';
-
 class BookingWidget extends React.Component {
   state = {
     authenticated: false,
@@ -16,7 +14,6 @@ class BookingWidget extends React.Component {
     loading: false,
     error: false,
   }
-
   componentDidMount() {
     fetch('/api/authenticated')
       .then(handleErrors)
@@ -25,10 +22,8 @@ class BookingWidget extends React.Component {
           authenticated: data.authenticated,
         })
       })
-
     this.getPropertyBookings();
   }
-
   getPropertyBookings = () => {
     fetch(`/api/properties/${this.props.property_id}/bookings`)
       .then(handleErrors)
@@ -39,7 +34,6 @@ class BookingWidget extends React.Component {
         })
       })
   }
-
   submitBooking = (e) => {
     if (e) { e.preventDefault(); }
     
@@ -78,21 +72,18 @@ class BookingWidget extends React.Component {
     });
   }
   
-
   initiateStripeCheckout = (booking_id) => {
     return fetch(`/api/charges?booking_id=${booking_id}&cancel_url=${window.location.pathname}`, safeCredentials({
       method: 'POST',
     }))
       .then(handleErrors)
       .then(response => {
-        const stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY);
-
+        const stripe = Stripe('pk_test_51Q2HjKEHkn2ZS6oNGm8H0xNkSp5cULxZCGIQxkjM2cmJf4yMiXZz8dMrlQg9Pa166Cde3z6ad9xD19Eg7gMN3OWW00DVad7zLF');
         stripe.redirectToCheckout({
           sessionId: response.charge.checkout_session_id,
         }).then((result) => {
             if (result.error) {
                 console.error('Stripe Checkout Error:', result.error.message);
-
                 this.setState({
                     error: true,
                     errorMessage: result.error.message,
@@ -105,13 +96,9 @@ class BookingWidget extends React.Component {
         console.log(error);
       })
   }
-
   onDatesChange = ({ startDate, endDate }) => this.setState({ startDate, endDate })
-
   onFocusChange = (focusedInput) => this.setState({ focusedInput })
-
   isDayBlocked = day => this.state.existingBookings.filter(b => day.isBetween(b.start_date, b.end_date, null, '[)')).length > 0
-
   render () {
     const { authenticated, startDate, endDate, focusedInput } = this.state;
     if (!authenticated) {
@@ -121,14 +108,11 @@ class BookingWidget extends React.Component {
         </div>
       );
     };
-
     const { price_per_night } = this.props;
-
     let days;
     if (startDate && endDate) {
       days = endDate.diff(startDate, 'days');
     }
-
     return (
       <div className="border p-4 mb-4">
         <form onSubmit={this.submitBooking}>
@@ -161,5 +145,4 @@ class BookingWidget extends React.Component {
     )
   }
 }
-
 export default BookingWidget
