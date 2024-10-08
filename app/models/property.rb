@@ -14,4 +14,8 @@ class Property < ApplicationRecord
     validates :beds, presence: true, numericality: { only_integer: true, less_than: 20 }
     validates :baths, presence: true, numericality: { only_integer: true, less_than: 20 }
     validates :user, presence: true
+
+    def image_urls
+      images.map { |image| Rails.application.routes.url_helpers.rails_blob_url(image, only_path: true) if image.attached? }
+    end
   end

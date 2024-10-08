@@ -12,9 +12,11 @@ class Home extends React.Component {
     total_pages: null,
     next_page: null,
     loading: true,
+    user: null,
   }
 
   componentDidMount() {
+    // Fetch properties
     fetch('/api/properties?page=1')
       .then(handleErrors)
       .then(data => {
@@ -23,8 +25,15 @@ class Home extends React.Component {
           total_pages: data.total_pages,
           next_page: data.next_page,
           loading: false,
-        })
-      })
+        });
+      });
+
+    // Fetch current user information to determine if the user is logged in
+    fetch('/api/current_user')
+      .then(handleErrors)
+      .then(data => {
+        this.setState({ user: data.user });
+      });
   }
 
   loadMore = () => {
@@ -40,15 +49,22 @@ class Home extends React.Component {
           total_pages: data.total_pages,
           next_page: data.next_page,
           loading: false,
-        })
-      })
+        });
+      });
   }
 
-  render () {
-    const { properties, next_page, loading } = this.state;
+  render() {
+    const { properties, next_page, loading, user } = this.state;
     return (
       <Layout>
         <div className="container pt-4">
+          {user && (
+            <div className="mb-4 text-right">
+              <a href="/properties/new" className="btn btn-primary">
+                List a New Property
+              </a>
+            </div>
+          )}
           <h4 className="mb-1">Top-rated places to stay</h4>
           <p className="text-secondary mb-3">Explore some of the best-reviewed stays in the world</p>
           <div className="row">

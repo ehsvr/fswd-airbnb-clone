@@ -41,9 +41,11 @@ class Property extends React.Component {
       bedrooms,
       beds,
       baths,
-      image_url,
+      image_urls,
       user,
     } = property
+
+    const image_url = image_urls && image_urls.length > 0 ? image_urls[0] : '/assets/default-image.jpg';
 
     return (
       <Layout>
