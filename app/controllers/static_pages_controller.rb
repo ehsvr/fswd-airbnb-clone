@@ -12,4 +12,7 @@ class StaticPagesController < ApplicationController
   def signup
     render 'signup'
   end
+  def edit
+    render 'edit'
+  end
 end

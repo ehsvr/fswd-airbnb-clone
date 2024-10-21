@@ -1,33 +1,66 @@
-// app/javascript/src/new/new.scss
-form {
-    display: flex;
-    flex-direction: column;
-    max-width: 600px;
-    margin: auto;
-  
-    label {
-      margin-bottom: 5px;
-    }
-  
-    input,
-    textarea {
-      margin-bottom: 15px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-  
-    button {
-      padding: 10px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-  
-      &:hover {
-        background-color: #0056b3;
-      }
+// styles.scss
+
+$primary-color: #ff385c; // Airbnb primary color
+$secondary-color: #fff; // White
+$border-color: #ccc; // Light gray border
+$font-family: 'Arial', sans-serif;
+
+.property-form {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  background-color: $secondary-color;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: $primary-color;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid $border-color;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+
+    &:focus {
+      border-color: $primary-color;
+      outline: none;
     }
   }
-  
+
+  button {
+    background-color: $primary-color;
+    color: $secondary-color;
+    border: none;
+    border-radius: 5px;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+  }
+
+  .error-message {
+    color: red;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+}

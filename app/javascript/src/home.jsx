@@ -58,13 +58,6 @@ class Home extends React.Component {
     return (
       <Layout>
         <div className="container pt-4">
-          {user && (
-            <div className="mb-4 text-right">
-              <a href="/properties/new" className="btn btn-primary">
-                List a New Property
-              </a>
-            </div>
-          )}
           <h4 className="mb-1">Top-rated places to stay</h4>
           <p className="text-secondary mb-3">Explore some of the best-reviewed stays in the world</p>
           <div className="row">
@@ -72,7 +65,7 @@ class Home extends React.Component {
               return (
                 <div key={property.id} className="col-6 col-lg-4 mb-4 property">
                   <a href={`/property/${property.id}`} className="text-body text-decoration-none">
-                    <div className="property-image mb-1 rounded" style={{ backgroundImage: `url(${property.image_url})` }} />
+                  <div className="property-image mb-1 rounded" style={{ backgroundImage: `url(${property.image_urls && property.image_urls.length > 0 ? property.image_urls[0] : '/images/default-image.jpg'})` }} />
                     <p className="text-uppercase mb-0 text-secondary"><small><b>{property.city}</b></small></p>
                     <h6 className="mb-0">{property.title}</h6>
                     <p className="mb-0"><small>${property.price_per_night} USD/day </small></p>

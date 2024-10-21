@@ -7,7 +7,8 @@ module Api
     end
 
     def create
-      @property = current_user.properties.new(property_params)
+      user = User.find(current_user)
+      @property = user.properties.new(property_params)
       if @property.save
         @property.images.attach(params[:property][:images]) if params[:property][:images].present?
         render json: @property, status: :created
@@ -17,7 +18,6 @@ module Api
     end
 
     def edit
-      # Renders the form to edit an existing property
     end
 
     def update
@@ -25,6 +25,14 @@ module Api
         render json: @property, status: :ok
       else
         render json: { errors: @property.errors.full_messages }, status: :unprocessable_entity
+      end
+    end
+
+    def destroy
+      if @property.destroy
+        render json: { message: 'Property successfully deleted' }, status: :ok
+      else
+        render json: { error: 'Failed to delete property' }, status: :unprocessable_entity
       end
     end
 

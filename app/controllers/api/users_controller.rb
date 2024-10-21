@@ -10,16 +10,18 @@ module Api
       end
     end
 
-    def current_user
-      User.find_by(id: session[:user_id]) if session[:user_id]
-    end
-
     def current_user_info
       user = current_user
-      render json: { user: user }
+      if user
+        render json: { user: user }
+      else
+        render json: { error: 'User not found' }, status: :not_found
+      end
+      return
     end
 
     private
+
     def user_params
       params.require(:user).permit(:email, :password, :username)
     end
