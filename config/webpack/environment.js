@@ -1,3 +1,4 @@
+const { environment } = require('@rails/webpacker')
 const path = require('path')
 const customConfig = {
   resolve: {
