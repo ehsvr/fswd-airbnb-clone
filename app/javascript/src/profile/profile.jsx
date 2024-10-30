@@ -41,10 +41,13 @@ class Profile extends React.Component {
   }
 
   initiateStripeCheckout = (booking_id) => {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+  
     fetch(`/api/charges?booking_id=${booking_id}&cancel_url=${window.location.pathname}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
       },
       credentials: 'include',
     })
@@ -63,6 +66,7 @@ class Profile extends React.Component {
       console.log(error);
     });
   }
+  
 
   render() {
     const { user, bookings, loading } = this.state;
