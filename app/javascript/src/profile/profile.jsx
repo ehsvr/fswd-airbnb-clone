@@ -40,6 +40,30 @@ class Profile extends React.Component {
       });
   }
 
+  initiateStripeCheckout = (booking_id) => {
+    fetch(`/api/charges?booking_id=${booking_id}&cancel_url=${window.location.pathname}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+    .then(handleErrors)
+    .then(response => {
+      const stripe = Stripe('pk_test_51Q2HjKEHkn2ZS6oNGm8H0xNkSp5cULxZCGIQxkjM2cmJf4yMiXZz8dMrlQg9Pa166Cde3z6ad9xD19Eg7gMN3OWW00DVad7zLF');
+      stripe.redirectToCheckout({
+        sessionId: response.charge.checkout_session_id,
+      }).then((result) => {
+        if (result.error) {
+          alert(`Error: ${result.error.message}`);
+        }
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    });
+  }
+
   render() {
     const { user, bookings, loading } = this.state;
 
@@ -71,7 +95,11 @@ class Profile extends React.Component {
                   <p><strong>Dates:</strong> {booking.start_date} to {booking.end_date}</p>
                   <p><strong>Status:</strong> {booking.paid ? 'Paid' : 'Not Paid'}</p>
                   {!booking.paid && (
-                    <a href={`/checkout/${booking.id}`} className="pay-now">Proceed to Payment</a>
+                    <button 
+                      onClick={() => this.initiateStripeCheckout(booking.id)} 
+                      className="btn btn-primary">
+                      Proceed to Payment
+                    </button>
                   )}
                 </div>
               ))
