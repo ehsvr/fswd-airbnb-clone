@@ -53,19 +53,23 @@ class Profile extends React.Component {
     })
     .then(handleErrors)
     .then(response => {
-      const stripe = Stripe('pk_test_51Q2HjKEHkn2ZS6oNGm8H0xNkSp5cULxZCGIQxkjM2cmJf4yMiXZz8dMrlQg9Pa166Cde3z6ad9xD19Eg7gMN3OWW00DVad7zLF');
-      stripe.redirectToCheckout({
+      const stripe = window.Stripe('pk_test_51Q2HjKEHkn2ZS6oNGm8H0xNkSp5cULxZCGIQxkjM2cmJf4yMiXZz8dMrlQg9Pa166Cde3z6ad9xD19Eg7gMN3OWW00DVad7zLF');
+      return stripe.redirectToCheckout({
         sessionId: response.charge.checkout_session_id,
-      }).then((result) => {
-        if (result.error) {
-          alert(`Error: ${result.error.message}`);
-        }
       });
+    })
+    .then((result) => {
+      if (result.error) {
+        alert(`Error: ${result.error.message}`);
+      } else {
+        this.fetchUserBookings(this.state.user.id);
+      }
     })
     .catch(error => {
       console.log(error);
     });
   }
+  
   
 
   render() {

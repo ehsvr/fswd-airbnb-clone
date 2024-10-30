@@ -7,8 +7,10 @@ module Api
     end
 
     def create
-      user = User.find(current_user)
+      user = current_user
+      
       @property = user.properties.new(property_params)
+      
       if @property.save
         @property.images.attach(params[:property][:images]) if params[:property][:images].present?
         render json: @property, status: :created
@@ -16,6 +18,7 @@ module Api
         render json: { errors: @property.errors.full_messages }, status: :unprocessable_entity
       end
     end
+    
 
     def edit
     end

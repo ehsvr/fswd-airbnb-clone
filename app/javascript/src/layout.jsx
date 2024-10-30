@@ -56,7 +56,10 @@ class Layout extends React.Component {
                 {userCheck ? (
                   <>
                     <li className="nav-item">
-                      <span className="nav-link">Hi, <b>{userCheck.username}</b></span>
+                      <span className="nav-link">Hi, <b>{userCheck.username}!</b></span>
+                    </li>
+                    <li className="nav-item">
+                      <a className="nav-link" href="/new">List on Airbnb</a>
                     </li>
                     <li className="nav-item">
                       <a className="nav-link" href="/profile">Profile</a>

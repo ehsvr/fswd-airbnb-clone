@@ -16,7 +16,7 @@ class Property extends React.Component {
       .then(handleErrors)
       .then(data => {
         if (data.user) {
-          console.log("Fetched Current User ID:", data.user); // Update this log
+          console.log("Fetched Current User ID:", data.user);
           this.setState({ currentUserId: data.user });
         } else {
           console.error("No user data returned from /api/current_user");
@@ -44,7 +44,6 @@ class Property extends React.Component {
   handleDelete = () => {
     const { property } = this.state;
 
-    // Show confirmation dialog
     const isConfirmed = window.confirm('Are you sure you want to delete this property?');
     
     if (isConfirmed) {
@@ -56,7 +55,6 @@ class Property extends React.Component {
       })
         .then(response => {
           if (response.ok) {
-            // Redirect to home page after successful deletion
             window.location.href = '/';
           } else {
             console.error('Error deleting property');
