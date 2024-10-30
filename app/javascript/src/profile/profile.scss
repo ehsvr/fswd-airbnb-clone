@@ -1,0 +1,34 @@
+.container {
+    max-width: 800px; /* Set a max width for the profile container */
+    margin: 0 auto; /* Center the container */
+    padding: 20px; /* Add some padding */
+    background-color: #f9f9f9; /* Light background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+  }
+  
+  h1 {
+    text-align: center; /* Center the heading */
+    color: #333; /* Dark color for the heading */
+  }
+  
+  p {
+    font-size: 18px; /* Set a font size for paragraphs */
+    margin-bottom: 10px; /* Space between paragraphs */
+    color: #555; /* Slightly lighter color for text */
+  }
+  
+  strong {
+    color: #222; /* Darker color for labels */
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      padding: 15px; /* Adjust padding on smaller screens */
+    }
+  
+    p {
+      font-size: 16px; /* Slightly smaller text on smaller screens */
+    }
+  }
+  

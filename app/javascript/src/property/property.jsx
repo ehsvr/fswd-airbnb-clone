@@ -44,19 +44,25 @@ class Property extends React.Component {
   handleDelete = () => {
     const { property } = this.state;
 
-    fetch(`/api/properties/${property.id}`, {
-      method: 'DELETE',
-      headers: {
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-      },
-    })
-      .then(response => {
-        if (response.ok) {
-          window.location.href = '/properties';
-        } else {
-          console.error('Error deleting property');
-        }
-      });
+    // Show confirmation dialog
+    const isConfirmed = window.confirm('Are you sure you want to delete this property?');
+    
+    if (isConfirmed) {
+      fetch(`/api/properties/${property.id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+      })
+        .then(response => {
+          if (response.ok) {
+            // Redirect to home page after successful deletion
+            window.location.href = '/';
+          } else {
+            console.error('Error deleting property');
+          }
+        });
+    }
   };
 
   render() {

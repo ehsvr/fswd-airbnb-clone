@@ -1,23 +1,45 @@
-// layout.js
+// layout.jsx
 import React from 'react';
 import { handleErrors } from '@utils/fetchHelper';
 
 class Layout extends React.Component {
   state = {
-    user: null,
-  }
+    userCheck: null,
+  };
 
   componentDidMount() {
-    // Fetch current user information to determine if the user is logged in
     fetch('/api/current_user')
       .then(handleErrors)
       .then(data => {
-        this.setState({ user: data.user });
-      });
+        if (data.user) {
+          console.log("Fetched user:", data.user);
+          this.setState({ userCheck: data.user });
+        } else {
+          console.error("No user data returned from /api/current_user");
+        }
+      })
+      .catch(error => console.error('Error fetching current user:', error));
   }
 
+  handleLogout = () => {
+    fetch('/api/logout', {
+      method: 'DELETE',
+      headers: {
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      },
+    })
+    .then(response => {
+      if (response.ok) {
+        window.location.href = '/';
+      } else {
+        console.error('Error logging out');
+      }
+    })
+    .catch(error => console.error('Logout request failed:', error));
+  };
+
   render() {
-    const { user } = this.state;
+    const { userCheck } = this.state;
 
     return (
       <React.Fragment>
@@ -31,6 +53,20 @@ class Layout extends React.Component {
                 </li>
               </ul>
               <ul className="navbar-nav ms-auto">
+                {userCheck ? (
+                  <>
+                    <li className="nav-item">
+                      <span className="nav-link">Hi, <b>{userCheck.username}</b></span>
+                    </li>
+                    <li className="nav-item">
+                      <a className="nav-link" href="/profile">Profile</a>
+                    </li>
+                    <li className="nav-item">
+                      <button className="nav-link btn btn-link" onClick={this.handleLogout}>Logout</button>
+                    </li>
+                  </>
+                ) : (
+                  <>
                     <li className="nav-item">
                       <a className="nav-link" href="/new">List on Airbnb</a>
                     </li>
@@ -40,6 +76,8 @@ class Layout extends React.Component {
                     <li className="nav-item">
                       <a className="nav-link" href="/signup">Sign Up</a>
                     </li>
+                  </>
+                )}
               </ul>
             </div>
           </div>

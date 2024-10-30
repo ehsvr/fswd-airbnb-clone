@@ -28,7 +28,6 @@ class Home extends React.Component {
         });
       });
 
-    // Fetch current user information to determine if the user is logged in
     fetch('/api/current_user')
       .then(handleErrors)
       .then(data => {

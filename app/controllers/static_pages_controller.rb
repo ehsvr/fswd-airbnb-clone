@@ -15,4 +15,7 @@ class StaticPagesController < ApplicationController
   def edit
     render 'edit'
   end
+  def profile
+    render 'profile'
+  end
 end

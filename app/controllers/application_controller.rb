@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
         token = cookies.signed[:airbnb_session_token]
         session = Session.find_by(token: token)
         if session
-            @current_user ||= session.user_id
+            @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
         else
             @current_user = nil
         end

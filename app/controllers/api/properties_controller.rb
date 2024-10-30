@@ -52,8 +52,11 @@ module Api
     private
 
     def set_property
-      @property = Property.find(params[:id])
-    end
+  @property = Property.find_by(id: params[:id])
+  if @property.nil?
+    redirect_to properties_path, alert: "Property not found"
+  end
+end
 
     def property_params
       params.require(:property).permit(

@@ -1,17 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Layout from '@src/layout'; // Assuming Layout is shared across pages
+import Layout from '@src/layout';
 import { handleErrors } from '@utils/fetchHelper';
-import './property.scss';
+import '../property/property.scss';
 
 class EditProperty extends React.Component {
   state = {
-    property: {},
+    property: {
+      title: '',
+      description: '',
+      city: '',
+      country: '',
+      property_type: '',
+      price_per_night: 0,
+      max_guests: 0,
+      bedrooms: 0,
+      beds: 0,
+      baths: 0,
+    },
     loading: true,
   };
 
   componentDidMount() {
-    // Fetch the property to edit based on the property ID
     const propertyId = this.props.property_id;
 
     fetch(`/api/properties/${propertyId}`)
@@ -23,6 +33,18 @@ class EditProperty extends React.Component {
         });
       });
   }
+
+  handleChange = (e) => {
+    const { name, value } = e.target;
+    this.setState({
+      property: {
+        ...this.state.property,
+        [name]: name === 'price_per_night' || name === 'max_guests' || name === 'bedrooms' || name === 'beds' || name === 'baths'
+          ? parseInt(value) || 0  
+          : value,
+      },
+    });
+  };
 
   handleUpdate = (event) => {
     event.preventDefault();
@@ -62,12 +84,115 @@ class EditProperty extends React.Component {
               <input
                 type="text"
                 id="title"
+                name="title"
                 value={property.title}
-                onChange={(e) => this.setState({ property: { ...property, title: e.target.value } })}
+                onChange={this.handleChange}
                 className="form-control"
               />
             </div>
-            {/* Other form fields for editing property */}
+            <div className="mb-3">
+              <label htmlFor="description" className="form-label">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                value={property.description}
+                onChange={this.handleChange}
+                className="form-control"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="city" className="form-label">City</label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                value={property.city}
+                onChange={this.handleChange}
+                className="form-control"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="country" className="form-label">Country</label>
+              <input
+                type="text"
+                id="country"
+                name="country"
+                value={property.country}
+                onChange={this.handleChange}
+                className="form-control"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="property_type" className="form-label">Property Type</label>
+              <input
+                type="text"
+                id="property_type"
+                name="property_type"
+                value={property.property_type}
+                onChange={this.handleChange}
+                className="form-control"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="price_per_night" className="form-label">Price per Night</label>
+              <input
+                type="number"
+                id="price_per_night"
+                name="price_per_night"
+                value={property.price_per_night}
+                onChange={this.handleChange}
+                className="form-control"
+                min="0" 
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="max_guests" className="form-label">Max Guests</label>
+              <input
+                type="number"
+                id="max_guests"
+                name="max_guests"
+                value={property.max_guests}
+                onChange={this.handleChange}
+                className="form-control"
+                min="0"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="bedrooms" className="form-label">Bedrooms</label>
+              <input
+                type="number"
+                id="bedrooms"
+                name="bedrooms"
+                value={property.bedrooms}
+                onChange={this.handleChange}
+                className="form-control"
+                min="0"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="beds" className="form-label">Beds</label>
+              <input
+                type="number"
+                id="beds"
+                name="beds"
+                value={property.beds}
+                onChange={this.handleChange}
+                className="form-control"
+                min="0"
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="baths" className="form-label">Baths</label>
+              <input
+                type="number"
+                id="baths"
+                name="baths"
+                value={property.baths}
+                onChange={this.handleChange}
+                className="form-control"
+                min="0"
+              />
+            </div>
             <button type="submit" className="btn btn-primary">Update Property</button>
           </form>
         </div>
@@ -75,6 +200,8 @@ class EditProperty extends React.Component {
     );
   }
 }
+
+export default EditProperty;
 
 document.addEventListener('DOMContentLoaded', () => {
   const propertyId = document.getElementById('edit-property-root').dataset.propertyId;

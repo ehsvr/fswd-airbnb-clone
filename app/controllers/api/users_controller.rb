@@ -17,7 +17,11 @@ module Api
       else
         render json: { error: 'User not found' }, status: :not_found
       end
-      return
+    end
+    
+    def logout
+      reset_session
+      render json: { success: true }, status: :ok
     end
 
     private

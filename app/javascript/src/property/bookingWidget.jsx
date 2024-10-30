@@ -1,9 +1,9 @@
-// bookingWidget.jsx
 import React from 'react';
 import 'react-dates/initialize';
 import { DateRangePicker } from 'react-dates';
 import { safeCredentials, handleErrors } from '@utils/fetchHelper';
 import 'react-dates/lib/css/_datepicker.css';
+
 class BookingWidget extends React.Component {
   state = {
     authenticated: false,
@@ -13,44 +13,35 @@ class BookingWidget extends React.Component {
     focusedInput: null,
     loading: false,
     error: false,
+    success: false, 
   }
+
   componentDidMount() {
     fetch('/api/authenticated')
       .then(handleErrors)
       .then(data => {
-        this.setState({
-          authenticated: data.authenticated,
-        })
-      })
+        this.setState({ authenticated: data.authenticated });
+      });
     this.getPropertyBookings();
   }
+
   getPropertyBookings = () => {
     fetch(`/api/properties/${this.props.property_id}/bookings`)
       .then(handleErrors)
       .then(data => {
-        console.log(data);
-        this.setState({
-          existingBookings: data.bookings,
-        })
-      })
+        this.setState({ existingBookings: data.bookings });
+      });
   }
+
   submitBooking = (e) => {
     if (e) { e.preventDefault(); }
     
     const { startDate, endDate } = this.state;
-  
-    // Check if dates are selected before proceeding
     if (!startDate || !endDate) {
       alert("Please select a start and end date before submitting.");
       return;
     }
-  
-    // Log the startDate and endDate to make sure they are correct
-    console.log('Submitting Booking with Dates:', {
-      startDate: startDate.format('YYYY-MM-DD'),
-      endDate: endDate.format('YYYY-MM-DD')
-    });
-  
+
     fetch(`/api/bookings`, safeCredentials({
       method: 'POST',
       credentials: 'include',
@@ -64,43 +55,49 @@ class BookingWidget extends React.Component {
     }))
     .then(handleErrors)
     .then(response => {
-      console.log('Booking Created:', response);
       return this.initiateStripeCheckout(response.booking.id);
     })
     .catch(error => {
-      console.error('Error during booking creation:', error); // Log any POST errors
+      console.error('Error during booking creation:', error);
     });
   }
-  
+
   initiateStripeCheckout = (booking_id) => {
     return fetch(`/api/charges?booking_id=${booking_id}&cancel_url=${window.location.pathname}`, safeCredentials({
       method: 'POST',
     }))
-      .then(handleErrors)
-      .then(response => {
-        const stripe = Stripe('pk_test_51Q2HjKEHkn2ZS6oNGm8H0xNkSp5cULxZCGIQxkjM2cmJf4yMiXZz8dMrlQg9Pa166Cde3z6ad9xD19Eg7gMN3OWW00DVad7zLF');
-        stripe.redirectToCheckout({
-          sessionId: response.charge.checkout_session_id,
-        }).then((result) => {
-            if (result.error) {
-                console.error('Stripe Checkout Error:', result.error.message);
-                this.setState({
-                    error: true,
-                    errorMessage: result.error.message,
-                });
-                alert(`Error: ${result.error.message}`);
-            }
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      })
+    .then(handleErrors)
+    .then(response => {
+      const stripe = Stripe('pk_test_51Q2HjKEHkn2ZS6oNGm8H0xNkSp5cULxZCGIQxkjM2cmJf4yMiXZz8dMrlQg9Pa166Cde3z6ad9xD19Eg7gMN3OWW00DVad7zLF');
+      stripe.redirectToCheckout({
+        sessionId: response.charge.checkout_session_id,
+      }).then((result) => {
+        if (result.error) {
+          console.error('Stripe Checkout Error:', result.error.message);
+          this.setState({
+            error: true,
+            errorMessage: result.error.message,
+          });
+          alert(`Error: ${result.error.message}`);
+        } else {
+          this.setState({ success: true }); 
+          window.location.href = '/booking/success'; 
+        }
+      });
+    })
+    .catch(error => {
+      console.log(error);
+    });
   }
-  onDatesChange = ({ startDate, endDate }) => this.setState({ startDate, endDate })
-  onFocusChange = (focusedInput) => this.setState({ focusedInput })
-  isDayBlocked = day => this.state.existingBookings.filter(b => day.isBetween(b.start_date, b.end_date, null, '[)')).length > 0
-  render () {
-    const { authenticated, startDate, endDate, focusedInput } = this.state;
+
+  onDatesChange = ({ startDate, endDate }) => this.setState({ startDate, endDate });
+  onFocusChange = (focusedInput) => this.setState({ focusedInput });
+  isDayBlocked = day => this.state.existingBookings.filter(b => day.isBetween(b.start_date, b.end_date, null, '[)')).length > 0;
+
+  render() {
+    const { authenticated, startDate, endDate, focusedInput, success } = this.state;
+    if (success) return <p>Redirecting to success page...</p>;
+
     if (!authenticated) {
       return (
         <div className="border p-4 mb-4">
@@ -108,11 +105,13 @@ class BookingWidget extends React.Component {
         </div>
       );
     };
+
     const { price_per_night } = this.props;
     let days;
     if (startDate && endDate) {
       days = endDate.diff(startDate, 'days');
     }
+
     return (
       <div className="border p-4 mb-4">
         <form onSubmit={this.submitBooking}>
@@ -120,14 +119,14 @@ class BookingWidget extends React.Component {
           <hr/>
           <div style={{ marginBottom: focusedInput ? '400px': '2rem' }}>
             <DateRangePicker
-              startDate={startDate} // momentPropTypes.momentObj or null,
-              startDateId="start_date" // PropTypes.string.isRequired,
-              endDate={endDate} // momentPropTypes.momentObj or null,
-              endDateId="end_date" // PropTypes.string.isRequired,
+              startDate={startDate}
+              startDateId="start_date"
+              endDate={endDate}
+              endDateId="end_date"
               onDatesChange={this.onDatesChange}
-              focusedInput={focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
-              onFocusChange={this.onFocusChange} // PropTypes.func.isRequired,
-              isDayBlocked={this.isDayBlocked} // block already booked dates
+              focusedInput={focusedInput}
+              onFocusChange={this.onFocusChange}
+              isDayBlocked={this.isDayBlocked}
               numberOfMonths={1}
             />
           </div>
@@ -137,12 +136,13 @@ class BookingWidget extends React.Component {
               <p>${(price_per_night * days).toLocaleString()}</p>
             </div>
           )}
-            <button type="submit" className="btn btn-large btn-danger btn-block">
-                Book
-            </button>
+          <button type="submit" className="btn btn-large btn-danger btn-block">
+            Book
+          </button>
         </form>
       </div>
-    )
+    );
   }
 }
-export default BookingWidget
+
+export default BookingWidget;
