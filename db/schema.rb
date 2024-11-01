@@ -47,7 +47,7 @@ ActiveRecord::Schema.define(version: 2024_10_03_163211) do
     t.integer "property_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "paid"
+    t.boolean "paid", default: false
     t.index ["property_id"], name: "index_bookings_on_property_id"
     t.index ["user_id"], name: "index_bookings_on_user_id"
   end

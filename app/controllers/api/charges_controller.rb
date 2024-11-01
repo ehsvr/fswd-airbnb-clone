@@ -47,33 +47,37 @@ module Api
 
     def mark_complete
       endpoint_secret = ENV['STRIPE_MARK_COMPLETE_WEBHOOK_SIGNING_SECRET']
-
-      event = nil
-
+    
       begin
         sig_header = request.env['HTTP_STRIPE_SIGNATURE']
         payload = request.body.read
-        event = Stripe::Webhook.construct_event(
-          payload, sig_header, endpoint_secret
-        )
-      rescue JSON::ParserError => e
-        return head :bad_request
-      rescue Stripe::SignatureVerificationError => e
+        event = Stripe::Webhook.construct_event(payload, sig_header, endpoint_secret)
+      rescue JSON::ParserError, Stripe::SignatureVerificationError => e
+        Rails.logger.error("Webhook Error: #{e.message}")
         return head :bad_request
       end
-
+    
       if event['type'] == 'checkout.session.completed'
         session = event['data']['object']
-
+    
         charge = Charge.find_by(checkout_session_id: session.id)
-        return head :bad_request if !charge
-
-        charge.update({ complete: true })
-
+        if charge.nil?
+          Rails.logger.error("Charge not found with session ID: #{session.id}")
+          return head :not_found
+        end
+    
+        ActiveRecord::Base.transaction do
+          charge.update!(complete: true)
+    
+          charge.booking.update_column(:paid, true)
+        end
+    
         return head :ok
       end
-
-      return head :bad_request
+    
+      head :bad_request
     end
+    
+    
   end
 end

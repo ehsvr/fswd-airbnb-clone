@@ -12,12 +12,15 @@ class Profile extends React.Component {
   };
 
   componentDidMount() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentCompleted = urlParams.get('payment') === 'success';
+  
     fetch('/api/current_user')
       .then(handleErrors)
       .then(data => {
         if (data.user) {
           this.setState({ user: data.user });
-          this.fetchUserBookings(data.user.id);
+          this.fetchUserBookings(data.user.id, paymentCompleted); // Passing an indicator if payment is complete
         } else {
           this.setState({ loading: false });
         }
@@ -27,8 +30,12 @@ class Profile extends React.Component {
         this.setState({ loading: false });
       });
   }
-
-  fetchUserBookings = (userId) => {
+  
+  fetchUserBookings = (userId, forceReload = false) => {
+    if (forceReload) {
+      this.setState({ loading: true });  // Show loading state while refetching
+    }
+  
     fetch(`/api/users/${userId}/bookings`)
       .then(handleErrors)
       .then(data => {
